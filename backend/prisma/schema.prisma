@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Modelo de Usuario
+model User {
+  id             Int                    @id @default(autoincrement())
+  email          String                 @unique
+  name           String
+  password       String
+  role           String                 @default("participant")
+  
+  // Relaciones: Un usuario puede crear varios hackathons y participar en varios
+  hackathons     Hackathon[]            @relation("Author")
+  participations HackathonParticipant[]
+}
+
+// 2. Modelo de Hackathon
+model Hackathon {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  start       DateTime
+  end         DateTime
+  isActive    Boolean  @default(true)
+  
+  // Relación con el usuario administrador que lo creó
+  authorId    Int
+  author      User     @relation("Author", fields: [authorId], references: [id])
+  
+  // Participantes que se han unido a este evento
+  participants HackathonParticipant[]
+}
+
+// 3. Tabla intermedia para registrar qué usuario se une a qué hackathon
+model HackathonParticipant {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  hackathonId Int
+  
+  user        User     @relation(fields: [userId], references: [id])
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+
+  // Restricción única: Un usuario no puede unirse dos veces al mismo hackathon [7]
+  @@unique([userId, hackathonId]) 
+}
