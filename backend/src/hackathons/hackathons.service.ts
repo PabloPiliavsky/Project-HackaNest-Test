@@ -19,7 +19,7 @@ export class HackathonsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const hackathon = await this.prisma.hackathon.findUnique({
       where: { id: id },
     });
@@ -31,20 +31,20 @@ export class HackathonsService {
     return hackathon;
   }
 
-  update(id: number, updateHackathonDto: UpdateHackathonDto) {
+  update(id: string, updateHackathonDto: UpdateHackathonDto) {
     return this.prisma.hackathon.update({
       where: { id: id },
       data: updateHackathonDto,
     });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.prisma.hackathon.delete({
       where: { id: id },
     });
   }
 
-  async join(hackathonId: number, personId: number) {
+  async join(hackathonId: string, personId: string) {
     const hackathon = await this.findOne(hackathonId);
 
     if (!hackathon.isActive) {

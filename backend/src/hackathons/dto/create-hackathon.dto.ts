@@ -27,6 +27,7 @@ export class CreateHackathonDto {
   isActive?: boolean;
 
   // Since hackathons are created by an admin "Person", we need their ID
+  @IsString()
   @IsNotEmpty()
-  authorId: number;
+  authorId: string;
 }

@@ -20,10 +20,6 @@ export const auth = betterAuth({
       }
     }
   },
-  advanced: {
-    // @ts-expect-error Better Auth types are missing generateId in advanced options
-    generateId: false
-  },
   logger: {
     level: "debug"
   }

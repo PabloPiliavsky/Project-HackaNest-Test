@@ -12,15 +12,15 @@ export class PersonsService {
     return `This action returns all persons`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} person`;
   }
 
-  update(id: number, updatePersonDto: UpdatePersonDto) {
+  update(id: string, updatePersonDto: UpdatePersonDto) {
     return `This action updates a #${id} person`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} person`;
   }
 }

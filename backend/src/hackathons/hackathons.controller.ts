@@ -19,16 +19,16 @@ export class HackathonsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.hackathonsService.findOne(+id);
+    return this.hackathonsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateHackathonDto: UpdateHackathonDto) {
-    return this.hackathonsService.update(+id, updateHackathonDto);
+    return this.hackathonsService.update(id, updateHackathonDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.hackathonsService.remove(+id);
+    return this.hackathonsService.remove(id);
   }
 }
