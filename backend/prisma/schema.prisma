@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,56 +9,111 @@ datasource db {
 }
 
 // 1. Modelo de Usuario (Solo Identidad / Autenticación)
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      String   @default("participant")
-  
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  role          String    @default("participant")
   // Relación 1 a 1 con Person
-  person    Person?
+  person        Person?
+  name          String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
 // 2. Modelo de Persona (El actor dentro del programa)
+
 model Person {
-  id        Int      @id @default(autoincrement())
-  name      String
-  
+  id             Int                    @id @default(autoincrement())
+  name           String
   // Llave foránea hacia User para la relación 1 a 1
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
-  
+  userId         Int                    @unique
+  user           User                   @relation(fields: [userId], references: [id])
   // Ahora la Persona es quien opera el programa
   hackathons     Hackathon[]            @relation("Author")
   participations HackathonParticipant[]
 }
 
 // 3. Modelo de Hackathon
+
 model Hackathon {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  start       DateTime
-  end         DateTime
-  isActive    Boolean  @default(true)
-  
+  id           Int                    @id @default(autoincrement())
+  name         String
+  description  String?
+  start        DateTime
+  end          DateTime
+  isActive     Boolean                @default(true)
   // Relación: El creador ahora es una Persona
-  authorId    Int
-  author      Person   @relation("Author", fields: [authorId], references: [id])
-  
+  authorId     Int
+  author       Person                 @relation("Author", fields: [authorId], references: [id])
   participants HackathonParticipant[]
 }
 
 // 4. Tabla intermedia (Participantes)
+
 model HackathonParticipant {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   personId    Int
   hackathonId Int
-  
   // Se conecta a la Persona y al Hackathon
   person      Person    @relation(fields: [personId], references: [id])
   hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
 
   // Restricción única actualizada
-  @@unique([personId, hackathonId]) 
+  @@unique([personId, hackathonId])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
