@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { auth } from './auth';
 import { toNodeHandler } from 'better-auth/node';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   // the @All decorador catches ANY method (GET, POST, PUT, etc.) 
   // that arrives at the /api/auth route and its subroutes

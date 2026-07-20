@@ -19,5 +19,12 @@ export const auth = betterAuth({
         defaultValue: 'participant' // Default role will be participant
       }
     }
+  },
+  advanced: {
+    // @ts-expect-error Better Auth types are missing generateId in advanced options
+    generateId: false
+  },
+  logger: {
+    level: "debug"
   }
 });
