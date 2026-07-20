@@ -7,20 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 1. Modelo de Usuario
+// 1. Modelo de Usuario (Solo Identidad / Autenticación)
 model User {
-  id             Int                    @id @default(autoincrement())
-  email          String                 @unique
-  name           String
-  password       String
-  role           String                 @default("participant")
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("participant")
   
-  // Relaciones: Un usuario puede crear varios hackathons y participar en varios
+  // Relación 1 a 1 con Person
+  person    Person?
+}
+
+// 2. Modelo de Persona (El actor dentro del programa)
+model Person {
+  id        Int      @id @default(autoincrement())
+  name      String
+  
+  // Llave foránea hacia User para la relación 1 a 1
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  
+  // Ahora la Persona es quien opera el programa
   hackathons     Hackathon[]            @relation("Author")
   participations HackathonParticipant[]
 }
 
-// 2. Modelo de Hackathon
+// 3. Modelo de Hackathon
 model Hackathon {
   id          Int      @id @default(autoincrement())
   name        String
@@ -29,23 +41,23 @@ model Hackathon {
   end         DateTime
   isActive    Boolean  @default(true)
   
-  // Relación con el usuario administrador que lo creó
+  // Relación: El creador ahora es una Persona
   authorId    Int
-  author      User     @relation("Author", fields: [authorId], references: [id])
+  author      Person   @relation("Author", fields: [authorId], references: [id])
   
-  // Participantes que se han unido a este evento
   participants HackathonParticipant[]
 }
 
-// 3. Tabla intermedia para registrar qué usuario se une a qué hackathon
+// 4. Tabla intermedia (Participantes)
 model HackathonParticipant {
   id          Int      @id @default(autoincrement())
-  userId      Int
+  personId    Int
   hackathonId Int
   
-  user        User     @relation(fields: [userId], references: [id])
+  // Se conecta a la Persona y al Hackathon
+  person      Person    @relation(fields: [personId], references: [id])
   hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
 
-  // Restricción única: Un usuario no puede unirse dos veces al mismo hackathon [7]
-  @@unique([userId, hackathonId]) 
+  // Restricción única actualizada
+  @@unique([personId, hackathonId]) 
 }
