@@ -1,14 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { TransformInterceptor } from './utils/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // with this we can validate the data sended in the request (like DTO)
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
+
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // with this we can clean unnecesary data
+    whitelist: true,
   }));
+
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   await app.listen(process.env.PORT ?? 3000);
 }
