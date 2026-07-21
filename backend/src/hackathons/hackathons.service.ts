@@ -22,6 +22,13 @@ export class HackathonsService {
   async findOne(id: string) {
     const hackathon = await this.prisma.hackathon.findUnique({
       where: { id: id },
+      include: {
+        participants: {
+          include: {
+            person: true,
+          },
+        },
+      },
     });
 
     if (!hackathon) {
@@ -74,5 +81,20 @@ export class HackathonsService {
         hackathonId: hackathonId,
       }
     });
+  }
+
+  async findPersonByUserId(userId: string) {
+    const person = await this.prisma.person.findUnique({
+      where: { userId },
+    });
+    if (!person) {
+      throw new NotFoundException(`Person profile not found for user ${userId}`);
+    }
+    return person;
+  }
+
+  async joinByUserId(hackathonId: string, userId: string) {
+    const person = await this.findPersonByUserId(userId);
+    return this.join(hackathonId, person.id);
   }
 }
