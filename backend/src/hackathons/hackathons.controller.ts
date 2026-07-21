@@ -5,7 +5,7 @@ import { UpdateHackathonDto } from './dto/update-hackathon.dto';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { Request } from 'express';
+import * as express from 'express';
 import { auth } from '../auth/auth';
 
 @ApiTags('Hackathons')
@@ -17,7 +17,7 @@ export class HackathonsController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Crear nueva hackathon (Solo Admins)' })
-  async create(@Body() createHackathonDto: CreateHackathonDto, @Req() req: Request) {
+  async create(@Body() createHackathonDto: CreateHackathonDto, @Req() req: express.Request) {
     const session = await auth.api.getSession({
       headers: new Headers(req.headers as Record<string, string>)
     });
@@ -59,7 +59,7 @@ export class HackathonsController {
 
   @Post(':id/join')
   @ApiOperation({ summary: 'Unirse a un hackathon' })
-  async join(@Param('id') id: string, @Req() req: Request) {
+  async join(@Param('id') id: string, @Req() req: express.Request) {
     const session = await auth.api.getSession({
       headers: new Headers(req.headers as Record<string, string>)
     });
